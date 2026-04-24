@@ -16,7 +16,7 @@ def download_huggingface_dataset(dataset_name="ealvaradob/phishing-dataset"):
     try:
         print(f"Fetching {dataset_name}...")
         # Loading the dataset from Hugging Face directly from the json to avoid unsupported dataset scripts
-        dataset = load_dataset("json", data_files="hf://datasets/ealvaradob/phishing-dataset/combined_reduced.json")
+        dataset = load_dataset("json", data_files="hf://datasets/ealvaradob/phishing-dataset/urls.json")
         
         # Convert to DataFrame (assuming 'train' split exists)
         df = pd.DataFrame(dataset['train'])
