@@ -1,0 +1,16 @@
+# Data Handling & ML
+pandas
+numpy
+scikit-learn
+
+# Visualization
+matplotlib
+seaborn
+
+# API & Data Acquisition
+requests
+datasets
+
+# Testing & Quality
+pytest
+pytest-cov
