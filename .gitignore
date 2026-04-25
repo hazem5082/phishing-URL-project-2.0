@@ -1,0 +1,27 @@
+# Data files - too large for GitHub (42MB+)
+project-root/data/raw/
+project-root/data/processed/
+
+# Trained model binary
+project-root/models/*.joblib
+
+# Generated result images (can be reproduced by running train_classifier.py)
+project-root/results/
+
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Coverage reports
+.coverage
+htmlcov/
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# OS files
+.DS_Store
+Thumbs.db
