@@ -3,7 +3,7 @@ import sys
 import joblib
 import pandas as pd
 
-# Add the project-root directory to the Python path
+# Dynamically resolve project-root so imports work regardless of CWD
 base_dir = os.path.dirname(os.path.dirname(__file__))
 sys.path.append(base_dir)
 
@@ -11,20 +11,15 @@ from src.feature_engineering.url_features import extract_url_features
 
 
 def predict_url(url, model):
-    """
-    Takes a raw URL string, extracts its numerical features,
-    and predicts whether it is Phishing or Legitimate.
-    """
-    features_dict = extract_url_features(url)
-    features_df = pd.DataFrame([features_dict])
-    prediction = model.predict(features_df)[0]
-    return "Phishing" if prediction == 1 else "Legitimate"
+    """Extracts features from a URL and returns a string prediction label."""
+    features_df = pd.DataFrame([extract_url_features(url)])
+    return "Phishing" if model.predict(features_df)[0] == 1 else "Legitimate"
 
 
 def run_demo():
     """
-    CLI script that loads the model, predicts an interactive URL,
-    AND runs 10 sample test cases as required by the rubric.
+    CLI demo: accepts an optional URL argument, then always prints 10 sample predictions.
+    Run with: python demo.py [url]
     """
     print("=" * 60)
     print("   PHISHING URL DETECTION SYSTEM - WORKING DEMO")
@@ -33,16 +28,15 @@ def run_demo():
     model_path = os.path.join(base_dir, "models", "phishing_rf_model.joblib")
 
     if not os.path.exists(model_path):
-        print(f"Error: Could not find the trained model at {model_path}")
-        print("Please make sure you ran train_classifier.py first!")
+        print(f"Error: Model not found at {model_path}")
+        print("Run train_classifier.py first.")
         return
 
     print("[*] Loading Random Forest Model...")
     rf_model = joblib.load(model_path)
-    print("[*] Model successfully loaded!\n")
+    print("[*] Model loaded.\n")
 
-    # 1. Interactive CLI Prediction
-    # Support both command-line arguments and input prompts
+    # Accept URL from command-line arg or interactive prompt
     if len(sys.argv) > 1:
         user_url = sys.argv[1]
     else:
@@ -52,28 +46,23 @@ def run_demo():
         print("\n" + "-" * 50)
         print(f"Analyzing: {user_url}")
         prediction = predict_url(user_url, rf_model)
-
-        # Use plain ASCII labels to avoid Windows cp1252 encoding errors
-        if prediction == "Phishing":
-            print("Prediction:  [ *** PHISHING *** ]")
-        else:
-            print("Prediction:  [ LEGITIMATE ]")
+        result = "[ *** PHISHING *** ]" if prediction == "Phishing" else "[ LEGITIMATE ]"
+        print(f"Prediction:  {result}")
         print("-" * 50 + "\n")
 
-    # 2. Automated 10 Sample Test Cases (required by rubric)
+    # 10 required sample predictions (rubric)
     print("=" * 60)
     print("   RUBRIC REQUIREMENT: 10 SAMPLE PREDICTIONS")
     print("=" * 60)
 
     test_cases = [
-        # 5 Legitimate Examples - real-world HTTPS URLs
+        # 5 Legitimate
         ("https://www.google.com", "Legitimate"),
         ("https://github.com/microsoft/vscode", "Legitimate"),
         ("https://en.wikipedia.org/wiki/Machine_learning", "Legitimate"),
         ("https://www.amazon.com/gp/cart/view.html", "Legitimate"),
         ("https://stackoverflow.com/questions", "Legitimate"),
-
-        # 5 Phishing/Suspicious Examples
+        # 5 Phishing
         ("http://secure-login.bank.com.update-account.info", "Phishing"),
         ("http://verify-apple-id.com@login.com", "Phishing"),
         ("http://www.paypal.com.cgi-bin.webscr.cmd.login.submit.com", "Phishing"),
@@ -84,7 +73,6 @@ def run_demo():
     for url, expected in test_cases:
         prediction = predict_url(url, rf_model)
         match = "OK" if prediction == expected else "FAIL"
-
         print(f"URL: {url}")
         print(f"Expected: {expected:<10} | Predicted: {prediction:<10} [{match}]\n")
 
