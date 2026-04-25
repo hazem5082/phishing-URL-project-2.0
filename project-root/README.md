@@ -34,6 +34,7 @@ project-root/
 │   │   └── url_features.py   # Extracts 4 URL features → data/processed/
 │   ├── models/
 │   │   └── train_classifier.py  # Trains 3 models, saves charts + .joblib
+│   ├── eda_visualizations.py    # Generates 3 EDA figures (class dist, histogram, heatmap)
 │   └── demo.py               # CLI: loads .joblib and predicts any URL
 ├── tests/
 │   └── test_basic.py         # 84% Code Coverage Test Suite
@@ -65,10 +66,13 @@ python project-root/src/utils/data_loader.py
 # 2. Extract URL features
 python project-root/src/feature_engineering/url_features.py
 
-# 3. Train models and generate visual artifacts
+# 3. Generate EDA visualizations (3 figures)
+python project-root/src/eda_visualizations.py
+
+# 4. Train models and generate visual artifacts (5 figures)
 python project-root/src/models/train_classifier.py
 
-# 4. Run the working demo
+# 5. Run the working demo
 python project-root/src/demo.py
 # Or pass a URL directly:
 python project-root/src/demo.py "https://www.google.com"
@@ -91,6 +95,12 @@ Reads the raw CSV and engineers 4 structural URL features:
 | `has_https` | 1 if original URL used HTTPS |
 
 Outputs `data/processed/phishing_processed.csv`. Uses vectorized pandas operations for performance. Automatically samples 20,000 rows if the dataset exceeds that size.
+
+### `src/eda_visualizations.py`
+Generates 3 EDA figures from the processed dataset:
+- **Class Distribution Bar Chart** — visualises the balance between Legitimate and Phishing samples
+- **URL Length Histogram** — overlapping distributions of URL length per class
+- **Feature Correlation Heatmap** — Pearson correlation matrix across all 4 features and the label
 
 ### `src/models/train_classifier.py`
 Trains and compares three models using an 80/20 train-test split:
@@ -116,6 +126,23 @@ Loads the `.joblib` model and provides a CLI interface:
 ## Features Extracted
 
 The model operates on 4 structural signals derived from the raw URL string. No DNS lookups or external APIs are required, making predictions fully offline.
+
+---
+
+## Generated Artifacts (8 Figures Total)
+
+| # | File | Script | Description |
+|---|---|---|---|
+| 1 | `eda_class_distribution.png` | `eda_visualizations.py` | Bar chart of Legitimate vs Phishing sample counts |
+| 2 | `eda_url_length_histogram.png` | `eda_visualizations.py` | Overlapping URL length distributions per class |
+| 3 | `eda_correlation_heatmap.png` | `eda_visualizations.py` | Pearson correlation matrix of all features |
+| 4 | `cm_logistic_regression_baseline.png` | `train_classifier.py` | Confusion matrix — Logistic Regression |
+| 5 | `cm_random_forest.png` | `train_classifier.py` | Confusion matrix — Random Forest |
+| 6 | `cm_gradient_boosting.png` | `train_classifier.py` | Confusion matrix — Gradient Boosting |
+| 7 | `feature_importance_rf.png` | `train_classifier.py` | Feature importance bar chart — Random Forest |
+| 8 | `roc_auc_curve.png` | `train_classifier.py` | ROC-AUC comparison curve across all 3 models |
+
+All figures are saved to `results/` and are excluded from git (regenerate by running the pipeline).
 
 ---
 
